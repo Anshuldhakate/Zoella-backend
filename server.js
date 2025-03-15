@@ -3,14 +3,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const axios = require("axios");
+// const axios = require("axios"); //  Commenting out WhatsApp-related dependency
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
 // ✅ Check required environment variables
-if (!process.env.MONGO_URI || !process.env.META_ACCESS_TOKEN || !process.env.PHONE_NUMBER_ID || !process.env.ADMIN_WHATSAPP || !process.env.WEBHOOK_VERIFY_TOKEN) {
+if (!process.env.MONGO_URI /* || !process.env.META_ACCESS_TOKEN || !process.env.PHONE_NUMBER_ID || !process.env.ADMIN_WHATSAPP || !process.env.WEBHOOK_VERIFY_TOKEN */) {
   console.error("❌ Missing required environment variables. Please check your .env file.");
   process.exit(1);
 }
@@ -40,6 +40,7 @@ app.post("/api/contact", async (req, res) => {
     const newContact = new Contact({ firstName, lastName, email, phone, message });
     await newContact.save();
 
+    /* 
     // Send WhatsApp Message
     const whatsappMessage = `New Contact Submission:\n\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${phone}\nMessage: ${message}`;
 
@@ -60,13 +61,16 @@ app.post("/api/contact", async (req, res) => {
     );
 
     console.log("📩 Meta API Response:", response.data);
+    */
+
     res.status(200).json({ message: "Form submitted successfully!" });
   } catch (error) {
-    console.error("❌ Meta API Error:", error.response?.data || error.message);
+    console.error("❌ Error saving form data:", error.message);
     res.status(500).json({ error: "Error submitting form" });
   }
 });
 
+/* 
 // ✅ Webhook Verification
 app.get("/webhook", (req, res) => {
   const VERIFY_TOKEN = process.env.WEBHOOK_VERIFY_TOKEN;
@@ -130,6 +134,7 @@ app.post("/webhook", (req, res) => {
     res.sendStatus(404);
   }
 });
+*/
 
 // ✅ Health Check Route
 app.get("/", (req, res) => {
